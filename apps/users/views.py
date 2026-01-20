@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
@@ -9,7 +10,7 @@ from django.views import View
 from django.db.models import Prefetch
 from .models import User, RoleEnum
 from .forms import RegisterForm, LoginForm
-from movies.models import Comment
+from apps.movies.models import Comment
 
 # Create your views here.
 # ==================== AUTORYZACJA ====================
@@ -28,7 +29,8 @@ class RegisterView(CreateView):
         return redirect(self.success_url)
 
     def form_invalid(self, form):
-        if User.objects.filter(email=form.cleaned_data.get('email')).exists():
+        email = form.cleaned_data.get('email') or form.data.get('email')
+        if email and User.objects.filter(email=email).exists():
             messages.warning(self.request, "You've already signed up with that email, log in instead!")
             return redirect('users:login')
         return super().form_invalid(form)
@@ -66,6 +68,9 @@ class UserListView(LoginRequiredMixin, ListView):
     context_object_name = 'all_users'
 
     def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+
         if not (request.user.is_admin or request.user.is_moderator):
             messages.error(request, "You don't have permission to view this page.")
             return redirect('movies:list')

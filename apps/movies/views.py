@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 
 from .models import Movie, Comment, Vote
 from .forms import CreateMovieForm, CommentForm, FindMovieForm
-from users.models import User
+from apps.users.models import User
 
 load_dotenv()
 
@@ -256,7 +256,7 @@ class CommentCreateView(LoginRequiredMixin, View):
             parent = get_object_or_404(Comment, id=parent_id) if parent_id else None
 
             Comment.objects.create(
-                text=form.cleaned_data['comment_text'],
+                text=form.cleaned_data['text'],
                 author=request.user,
                 movie=movie,
                 user_rating=form.cleaned_data.get('user_rating'),

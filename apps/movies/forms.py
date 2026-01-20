@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from .models import Movie, Comment
 
 
-class MovieForm(forms.ModelForm):
+class CreateMovieForm(forms.ModelForm):
     """Formularz tworzenia/edycji filmu"""
 
     class Meta:

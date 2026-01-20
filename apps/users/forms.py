@@ -59,7 +59,7 @@ class RegisterForm(UserCreationForm):
         return user
 
 
-class CustomLoginForm(AuthenticationForm):
+class LoginForm(AuthenticationForm):
     """Formularz logowania"""
 
     username = forms.EmailField(

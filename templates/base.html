@@ -85,39 +85,39 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <form role="search" action="{% url 'search' %}" method="POST">
+                    <form role="search" action="{% url 'movies:search' %}" method="POST">
                         {% csrf_token %}
                         <input class="form-control" type="search" name="query" placeholder="Search" aria-label="Search">
                     </form>
                     <ul class="navbar-nav ms-auto py-4 py-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'get_all_movies' %}">Home</a>
+                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'movies:list' %}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'about' %}">About</a>
+                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'movies:list' %}">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'seo' %}">FAQ</a>
+                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'movies:list' %}">FAQ</a>
                         </li>
                         {% if user.is_authenticated %}
                             {% if user.role == "admin" or user.role == "moderator" %}
                                 <li class="nav-item">
-                                    <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'users' %}">Users</a>
+                                    <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'users:list' %}">Users</a>
                                 </li>
                             {% else %}
                                 <li class="nav-item">
-                                    <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'user_profile' user_id=user.id %}">Profile</a>
+                                    <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'users:profile' user_id=user.id %}">Profile</a>
                                 </li>
                             {% endif %}
                             <li class="nav-item">
-                                <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'logout' %}">Log Out</a>
+                                <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'users:logout' %}">Log Out</a>
                             </li>
                         {% else %}
                             <li class="nav-item">
-                                <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'login' %}">Login</a>
+                                <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'users:login' %}">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'register' %}">Register</a>
+                                <a class="nav-link px-lg-3 py-3 py-lg-4" href="{% url 'users:register' %}">Register</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -138,6 +138,8 @@
     {% endif %}
 </div>
 
+{% block content %}
+{% endblock %}
 
         <footer class="border-top">
             <div class="container px-4 px-lg-5">
