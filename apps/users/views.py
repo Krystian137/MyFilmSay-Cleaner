@@ -104,6 +104,10 @@ class AssignRoleView(LoginRequiredMixin, View):
 
         user = get_object_or_404(User, pk=user_id)
 
+        if user.is_admin:
+            messages.error(request, "You cannot modify admin accounts.")
+            return redirect('users:list')
+
         valid_roles = [RoleEnum.USER.value, RoleEnum.MODERATOR.value, RoleEnum.ADMIN.value]
         if role not in valid_roles:
             messages.error(request, "Invalid role.")
@@ -127,6 +131,10 @@ class UserDeleteView(LoginRequiredMixin, View):
             return redirect('users:list')
 
         user = get_object_or_404(User, id=user_id)
+
+        if user.is_admin:
+            messages.error(request, "You cannot delete admin accounts.")
+            return redirect('users:list')
 
         if request.user.id == user.id:
             messages.error(request, "You cannot delete your own account.")

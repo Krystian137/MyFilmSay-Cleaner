@@ -30,14 +30,14 @@
                 <p class="card-text">{{ user.email }}</p>
                 <a href="{% url 'users:profile' user.id %}" class="btn btn-primary mb-2">See Profile</a>
 
-                {% if user.is_authenticated and user.id != user.id %}
-                    {% if user.is_moderator and not user.is_admin %}
+                {% if request.user.is_authenticated and request.user.id != user.id and not user.is_admin %}
+                    {% if request.user.is_moderator or request.user.is_admin %}
                     <div class="dropdown mt-2">
                         <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                             More Options
                         </button>
                         <ul class="dropdown-menu">
-                            {% if user.is_admin and not u.is_admin %}
+                            {% if request.user.is_admin %}
                                 <li>
                                     <form action="{% url 'users:assign_role' user.id 'admin' %}" method="post">
                                         {% csrf_token %}
@@ -46,7 +46,7 @@
                                 </li>
                             {% endif %}
 
-                            {% if not user.is_moderator and not user.is_admin %}
+                            {% if not user.is_moderator %}
                                 <li>
                                     <form action="{% url 'users:assign_role' user.id 'moderator' %}" method="post">
                                         {% csrf_token %}
@@ -55,7 +55,7 @@
                                 </li>
                             {% endif %}
 
-                            {% if user.is_moderator or u.is_admin %}
+                            {% if user.is_moderator %}
                                 <li>
                                     <form action="{% url 'users:assign_role' user.id 'user' %}" method="post">
                                         {% csrf_token %}
@@ -64,9 +64,9 @@
                                 </li>
                             {% endif %}
 
-                            {% if user.is_admin and not u.is_admin %}
+                            {% if request.user.is_admin %}
                                 <li>
-                                    <form action="{% url 'users:delete' u.id %}" method="post" onsubmit="return confirm('Delete {{ user.name }}?');">
+                                    <form action="{% url 'users:delete' user.id %}" method="post" onsubmit="return confirm('Delete {{ user.name }}?');">
                                         {% csrf_token %}
                                         <button type="submit" class="dropdown-item text-danger">Delete User</button>
                                     </form>
