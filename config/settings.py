@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-
+from django.urls import reverse_lazy
 import os
 from dotenv import load_dotenv
 import sys
@@ -136,3 +136,7 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 AUTH_USER_MODEL = 'users.User'
+
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'movies:list'
+LOGOUT_REDIRECT_URL = 'movies:list'

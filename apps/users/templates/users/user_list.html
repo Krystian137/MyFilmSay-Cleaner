@@ -19,7 +19,7 @@
 
 <div class="users_container d-flex flex-wrap gap-4 justify-content-center mt-4">
     {% for user in all_users %}
-        <div class="card user_card" style="width: 18rem;">
+        <div class="user_card" style="width: 18rem;">
             <div class="commenterImageProfiles text-center mt-3">
                 <img src="https://ui-avatars.com/api/?name={{ user.name|urlencode }}&size=100&background=random&rounded=true"
                      class="rounded-circle" alt="{{ user.name }}" style="width: 100px; height: 100px;"/>

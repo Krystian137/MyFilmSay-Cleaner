@@ -24,12 +24,6 @@ class RegisterView(CreateView):
         messages.success(self.request, f"Welcome, {user.name}!")
         return redirect(self.success_url)
 
-    def form_invalid(self, form):
-        if User.objects.filter(email=form.cleaned_data.get('email')).exists():
-            messages.warning(self.request, "You've already signed up with that email, log in instead!")
-            return redirect('users:login')
-        return super().form_invalid(form)
-
 
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
