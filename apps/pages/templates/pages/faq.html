@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ - MyFilmSay{% endblock %}
+
+{% block content %}
+<header class="masthead" style="background-image: url('{% static 'assets/img/seo_banner.jpg' %}'); background-position: 50% 40%;">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="page-heading text-center text-white">
+                    <h1>Frequently Asked Questions</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="mb-5">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-9">
+                <section class="faq-section">
+                    <div class="mb-4">
+                        <h2 class="h5">How do I create an account?</h2>
+                        <p>Click the "Register" button in the navigation menu and fill out the registration form with your name,
+                        email, and password. Once registered, you'll be able to start reviewing movies immediately!</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h2 class="h5">How do I find a specific movie?</h2>
+                        <p>Use the search bar in the navigation menu to search for movies by title, director, or genre.
+                        You can also browse all movies on the homepage and sort them by title, rating, or release date.</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h2 class="h5">How does the rating system work?</h2>
+                        <p>Movies display an average rating from all user reviews. When you write a review, you can rate
+                        the movie on a scale of 0-10.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEO Schema Markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How do I create an account?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Click the Register button and fill out the registration form with your name, email, and password."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I find a specific movie?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Use the search bar to search by title, director, or genre. You can also browse and sort all movies on the homepage."
+                }
+            }
+        ]
+    }
+    </script>
+</main>
+{% endblock %}

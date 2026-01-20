@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Movie - MyFilmSay{% endblock %}
+
+{% block content %}
+<header class="masthead" style="background-image: url('{% static 'assets/img/add_movie_banner.jpg' %}')">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="page-heading">
+                    <h1>{% if object %}Edit Movie{% else %}Add Movie{% endif %}</h1>
+                    <span class="subheading">{% if object %}Update movie details{% else %}Add a new film to the database{% endif %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="mb-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="shadow-sm p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        <div class="d-flex gap-2 mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% if object %}Update{% else %}Add{% endif %} Movie
+                            </button>
+                            <a href="{% if object %}{% url 'movies:detail' object.id %}{% else %}{% url 'movies:list' %}{% endif %}"
+                               class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About - MyFilmSay{% endblock %}
+
+{% block content %}
+
+<header class="masthead" style="background-image: url('{% static 'assets/img/about_banner.jpg' %}')">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="page-heading">
+                    <h1>About MyFilmSay</h1>
+                    <span class="subheading">A community for movie lovers</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="mb-4">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <h2 class="section-heading">Our Mission</h2>
+                <p>
+                    MyFilmSay is a platform built by movie enthusiasts, for movie enthusiasts. We believe that every film
+                    deserves to be discussed, debated, and celebrated. Whether you're a casual viewer or a hardcore cinephile,
+                    your voice matters here.
+                </p>
+
+                <h2 class="section-heading">Join Us</h2>
+                <p>
+                    Create your free account today and start rating, reviewing, and discussing films with a community that
+                    shares your passion. Your next favorite movie is just a click away!
+                </p>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

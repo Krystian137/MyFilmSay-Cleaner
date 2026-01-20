@@ -1,0 +1,83 @@
+.carouselMain {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    position: relative;
+}
+
+.movie-poster {
+    flex: 1;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 510px;
+    width: auto;
+}
+
+.carousel-item-content {
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+    overflow: hidden;
+    max-height: 510px;
+}
+
+.movie-info {
+    flex: 1;
+    background-color: rgba(152, 152, 152, 0.23);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 510px;
+    overflow: hidden;
+}
+
+.movie-info p {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.movie-info .overview {
+    max-height: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.carousel-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    position: static;
+    filter: invert(100%);
+}
+
+@media (max-width: 768px) {
+    .movie-info p:not(:first-child):not(:nth-child(2)):not(:nth-child(4)) {
+        display: none;
+    }
+
+    .movie-info h1,
+    .movie-info p:first-of-type,
+    .movie-info p:nth-of-type(2),
+    .movie-info p:nth-of-type(3) {
+        margin: 8px 0;
+    }
+
+    .movie-info {
+        width: 90%;
+        margin: 10px auto;
+    }
+
+    .movie-poster {
+        height: auto;
+        width: 50vh;
+        max-height: 50vh
+    }
+}

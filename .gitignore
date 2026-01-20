@@ -1,0 +1,30 @@
+.venv/
+env/
+venv/
+
+.DS_Store
+Thumbs.db
+
+*.egg
+*.egg-info/
+*.dist-info/
+*.log
+pip-log.txt
+pip-delete-this-directory.txt
+
+db.sqlite3
+*.pyc
+__pycache__/
+
+.env                # Plik z wrażliwymi danymi (np. klucze API)
+*.env               # Wszystkie pliki .env
+
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+.idea/
+.vscode/
+
+*.bak
+*.swp
+*.swo

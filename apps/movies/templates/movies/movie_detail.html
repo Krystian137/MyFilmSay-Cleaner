@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block title %}{{ movie.title }} - MyFilmSay{% endblock %}
+
+{% block content %}
+ <!-- Movie Header Section -->
+<header class="masthead" style="background-image: url('{% if movie.img_url %}{{ movie.img_url }}{% else %}
+    {% static 'img/placeholder.jpg' %}{% endif %}');">
+    <div class="blur-overlay"></div>
+    <div class="container position-relative px-4 px-lg-5" style="z-index: 1;">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="custom-post-heading">
+                    <div class="image-container">
+                        {% if movie.img_url %}
+                            <img src="{{ movie.img_url }}" alt="{{ movie.title }}" class="custom-movie-poster">
+                        {% else %}
+                            <img src="{% static 'img/placeholder.jpg' %}" alt="{{ movie.title }}" class="custom-movie-poster">
+                        {% endif %}
+                    </div>
+                    <div class="custom-text-content">
+                        <h1>{{ movie.title }} ({{ movie.date }})</h1>
+                        <!-- Rating Circle -->
+                        <div class="progress-circle" data-percentage="{{ rating_percentage|floatformat:1 }}">
+                            <svg class="progress-circle__svg" viewBox="0 0 36 36">
+                                <path class="progress-circle__background" d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="progress-circle__progress" d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <text class="progress-circle__text" x="18" y="20.35">{{ movie.rating }}</text>
+                            </svg>
+                        </div>
+                        <p><strong>Genres:</strong> {{ movie.genres }}</p>
+                        <p><strong>Director:</strong> {{ movie.director }}</p>
+                        <p><strong>Writers:</strong> {{ movie.writers }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<article class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Overview Section -->
+            <section class="mb-5">
+                <h2 class="mb-3">Overview</h2>
+                <p>{{ movie.body|safe }}</p>
+            </section>
+            <!-- Comments Section for authenticated users -->
+            {% if user.is_authenticated %}
+            <section class="mb-5">
+                <h3 class="mb-3">Write a Review</h3>
+                <div class="p-4 shadow-sm">
+                    <form method="post" action="{% url 'movies:comment_create' movie.id %}">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        <button type="submit" class="btn btn-primary">
+                            Submit Review
+                        </button>
+                    </form>
+                </div>
+            </section>
+            {% else %}
+            <div class="alert alert-info text-center">
+                <a href="{% url 'users:login' %}?next={{ request.path }}">Log in</a> to write a review
+            </div>
+            {% endif %}
+            <!-- Comments List Section -->
+            <section>
+                <h3 class="mb-4">Reviews ({{ total_comments }})</h3>
+                <ul class="list-unstyled" id="commentList">
+                    {% include "movies/partials/comment_list.html" %}
+                </ul>
+            </section>
+        </div>
+    </div>
+</article>
+{% endblock %}

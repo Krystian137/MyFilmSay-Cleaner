@@ -1,21 +1,18 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import login, logout
+from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 from django.views import View
 from django.db.models import Prefetch
 from .models import User, RoleEnum
 from .forms import RegisterForm, LoginForm
-from movies.models import Comment
+from apps.movies.models import Comment
 
-# Create your views here.
-# ==================== AUTORYZACJA ====================
 
 class RegisterView(CreateView):
-    """Rejestracja nowego użytkownika"""
     model = User
     form_class = RegisterForm
     template_name = 'users/register.html'
@@ -23,7 +20,7 @@ class RegisterView(CreateView):
 
     def form_valid(self, form):
         user = form.save()
-        login(self.request, user)
+        login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
         messages.success(self.request, f"Welcome, {user.name}!")
         return redirect(self.success_url)
 
@@ -35,7 +32,6 @@ class RegisterView(CreateView):
 
 
 class CustomLoginView(LoginView):
-    """Logowanie użytkownika"""
     template_name = 'users/login.html'
     form_class = LoginForm
     redirect_authenticated_user = True
@@ -52,15 +48,13 @@ class CustomLoginView(LoginView):
         return super().form_invalid(form)
 
 
-class CustomLogoutView(LogoutView):
-    """Wylogowanie"""
-    next_page = reverse_lazy('movies:list')
+class UserLogoutView(View):
+    def post(self, request):
+        logout(request)
+        return redirect('movies:list')
 
-
-# ==================== ZARZĄDZANIE UŻYTKOWNIKAMI ====================
 
 class UserListView(LoginRequiredMixin, ListView):
-    """Lista wszystkich użytkowników (tylko dla adminów/moderatorów)"""
     model = User
     template_name = 'users/user_list.html'
     context_object_name = 'all_users'
@@ -73,7 +67,6 @@ class UserListView(LoginRequiredMixin, ListView):
 
 
 class UserProfileView(LoginRequiredMixin, DetailView):
-    """Profil użytkownika z jego komentarzami"""
     model = User
     template_name = 'users/user_profile.html'
     context_object_name = 'profile_owner'
@@ -82,14 +75,12 @@ class UserProfileView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Pobierz komentarze użytkownika pogrupowane po filmach
         comments = Comment.objects.filter(
             author=self.object
         ).select_related('movie', 'author').prefetch_related(
             Prefetch('replies', queryset=Comment.objects.select_related('author'))
         )
 
-        # Grupuj komentarze po filmach
         user_comments = {}
         for comment in comments:
             movie = comment.movie
@@ -100,10 +91,8 @@ class UserProfileView(LoginRequiredMixin, DetailView):
                 }
 
             if comment.parent is None:
-                # Główny komentarz
                 user_comments[movie]['comments'].append(comment)
             else:
-                # Odpowiedź
                 parent_id = comment.parent.id
                 if parent_id not in user_comments[movie]['replies']:
                     user_comments[movie]['replies'][parent_id] = []
@@ -114,23 +103,18 @@ class UserProfileView(LoginRequiredMixin, DetailView):
 
 
 class AssignRoleView(LoginRequiredMixin, View):
-    """Przypisywanie ról użytkownikom"""
-
     def post(self, request, user_id, role):
-        # Sprawdź uprawnienia
         if not (request.user.is_admin or request.user.is_moderator):
             messages.error(request, "You don't have permission to assign roles.")
             return redirect('movies:list')
 
         user = get_object_or_404(User, pk=user_id)
 
-        # Walidacja roli
         valid_roles = [RoleEnum.USER.value, RoleEnum.MODERATOR.value, RoleEnum.ADMIN.value]
         if role not in valid_roles:
             messages.error(request, "Invalid role.")
             return redirect('users:list')
 
-        # Nie pozwól przypisać sobie admina
         if role == RoleEnum.ADMIN.value and request.user.id == user.id:
             messages.error(request, "You cannot assign the admin role to yourself.")
             return redirect('users:list')
@@ -142,7 +126,6 @@ class AssignRoleView(LoginRequiredMixin, View):
 
 
 class UserDeleteView(LoginRequiredMixin, View):
-    """Usuwanie użytkownika (tylko admin)"""
 
     def post(self, request, user_id):
         if not request.user.is_admin:

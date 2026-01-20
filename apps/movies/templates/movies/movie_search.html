@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search: {{ query }} - MyFilmSay{% endblock %}
+
+{% block content %}
+<header class="masthead" style="background-image: url('{% static 'assets/img/bg_main_header.jpg' %}')">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="site-heading">
+                    <h1>Search Results</h1>
+                    <span class="subheading">{% if query %}Searching for: "{{ query }}"{% else %}Enter a search term{% endif %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container my-5">
+    {% if search_results %}
+        <p class="text-muted mb-4">Found {{ search_results.count }} result{{ search_results.count|pluralize }}</p>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 justify-content-center">
+            {% for movie in search_results %}
+            <div class="col">
+                <a href="{% url 'movies:detail' movie.slug %}" class="text-decoration-none">
+                    <div class="card">
+                        <div class="card-inner">
+                            <div class="front" style="background-image: url('{% if movie.img_url %}{{ movie.img_url }}{% else %}{% static 'assets/img/placeholder.jpg' %}{% endif %}');"></div>
+                            <div class="back">
+                                <div>
+                                    <div class="title">
+                                        {{ movie.title }} <span class="release_date">({{ movie.date }})</span>
+                                    </div>
+                                    <div class="rating">
+                                        <label>{{ movie.rating|default:"N/A" }}</label>
+                                        <i class="fas fa-star star"></i>
+                                    </div>
+                                    <p class="overview">{{ movie.genres|default:"No genres" }}</p>
+                                    {% if user.is_moderator or user.is_admin %}
+                                    <div class="mt-2">
+                                        <a href="{% url 'movies:update' movie.slug %}" class="btn btn-success btn-sm">Edit</a>
+                                        <form action="{% url 'movies:delete' movie.slug %}" method="post" class="d-inline" onsubmit="return confirm('Delete this movie?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center my-5">
+            <i class="fas fa-search fa-4x text-muted mb-3"></i>
+            <h3>No movies found{% if query %} for "{{ query }}"{% endif %}</h3>
+            <p class="text-muted">Try again with a different search</p>
+            <a href="{% url 'movies:list' %}" class="btn btn-primary mt-3">Browse All Movies</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

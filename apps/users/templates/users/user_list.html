@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Users - MyFilmSay{% endblock %}
+
+{% block content %}
+<header class="masthead" style="background-image: url('{% static 'assets/img/users_main_header.jpg' %}')" >
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="site-heading">
+                    <h1>Users</h1>
+                    <span class="subheading">All user profiles</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="users_container d-flex flex-wrap gap-4 justify-content-center mt-4">
+    {% for user in all_users %}
+        <div class="card user_card" style="width: 18rem;">
+            <div class="commenterImageProfiles text-center mt-3">
+                <img src="https://ui-avatars.com/api/?name={{ user.name|urlencode }}&size=100&background=random&rounded=true"
+                     class="rounded-circle" alt="{{ user.name }}" style="width: 100px; height: 100px;"/>
+            </div>
+            <div class="card-body text-center">
+                <h5 class="card-title">{{ user.name }}</h5>
+                <p class="card-text">{{ user.role }}</p>
+                <p class="card-text">{{ user.email }}</p>
+                <a href="{% url 'users:profile' user.id %}" class="btn btn-primary mb-2">See Profile</a>
+
+                {% if user.is_authenticated and user.id != user.id %}
+                    {% if user.is_moderator and not user.is_admin %}
+                    <div class="dropdown mt-2">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            More Options
+                        </button>
+                        <ul class="dropdown-menu">
+                            {% if user.is_admin and not u.is_admin %}
+                                <li>
+                                    <form action="{% url 'users:assign_role' user.id 'admin' %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-warning">Make Admin</button>
+                                    </form>
+                                </li>
+                            {% endif %}
+
+                            {% if not user.is_moderator and not user.is_admin %}
+                                <li>
+                                    <form action="{% url 'users:assign_role' user.id 'moderator' %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">Make Moderator</button>
+                                    </form>
+                                </li>
+                            {% endif %}
+
+                            {% if user.is_moderator or u.is_admin %}
+                                <li>
+                                    <form action="{% url 'users:assign_role' user.id 'user' %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">Revoke Role</button>
+                                    </form>
+                                </li>
+                            {% endif %}
+
+                            {% if user.is_admin and not u.is_admin %}
+                                <li>
+                                    <form action="{% url 'users:delete' u.id %}" method="post" onsubmit="return confirm('Delete {{ user.name }}?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger">Delete User</button>
+                                    </form>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

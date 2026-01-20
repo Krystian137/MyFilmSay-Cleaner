@@ -1,10 +1,7 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-
+# Create your models here.
 class RoleEnum(models.TextChoices):
     USER = "user", "User"
     MODERATOR = "moderator", "Moderator"
@@ -12,8 +9,6 @@ class RoleEnum(models.TextChoices):
 
 
 class UserManager(BaseUserManager):
-    """Custom manager for User model"""
-
     def create_user(self, email, name, password=None, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address')
@@ -42,12 +37,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, verbose_name="Email Address")
     name = models.CharField(max_length=255, verbose_name="Full Name")
-    role = models.CharField(
-        max_length=20,
-        choices=RoleEnum.choices,
-        default=RoleEnum.USER,
-        verbose_name="User Role"
-    )
+    role = models.CharField(max_length=20, choices=RoleEnum.choices, default=RoleEnum.USER, verbose_name="User Role")
     is_active = models.BooleanField(default=True, verbose_name="Active Status")
     is_staff = models.BooleanField(default=False, verbose_name="Staff Status")
     date_joined = models.DateTimeField(auto_now_add=True, verbose_name="Date Joined")

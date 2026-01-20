@@ -3,7 +3,6 @@ from django.contrib import admin
 from .models import Movie, Comment, Vote
 
 # Register your models here.
-
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
     list_display = ['title', 'date', 'rating', 'director']

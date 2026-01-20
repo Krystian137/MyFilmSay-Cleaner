@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Import from TMDB - MyFilmSay{% endblock %}
+
+{% block content %}
+<header class="masthead" style="background-image: url('{% static 'assets/img/add_movie_banner.jpg' %}')">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="page-heading">
+                    <h1>Import Movie</h1>
+                    <span class="subheading">Search The Movie Database (TMDB)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container my-5">
+    <!-- Search Form -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-6">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="input-group input-group-lg">
+                    {{ form.title }}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results with all matching movies -->
+    {% if options %}
+    <h3 class="mb-4">Select a movie to import:</h3>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        {% for movie in options %}
+        <div class="col">
+            <div class="card h-100 shadow-sm hover-lift">
+                {% if movie.poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w300{{ movie.poster_path }}"
+                         class="card-img-top" alt="{{ movie.title }}">
+                {% else %}
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center"
+                         style="height: 450px;">
+                        <i class="fas fa-film fa-4x opacity-50"></i>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h6 class="card-title">{{ movie.title }}</h6>
+                    <p class="text-muted small">{{ movie.release_date|default:"Unknown" }}</p>
+                    <a href="{% url 'movies:import' movie.id %}" class="btn btn-success btn-sm w-100">
+                        <i class="fas fa-plus"></i> Import
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

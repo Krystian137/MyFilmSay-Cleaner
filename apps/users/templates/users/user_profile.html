@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<header
+    class="masthead"
+    style="background-image: url('{% static 'assets/img/users_main_header.jpg' %}')"
+>
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="site-heading">
+                    <h1>{{ profile_owner.name }}</h1>
+                    <span class="subheading">{{ profile_owner.email }}</span>
+                    <span class="subheading">{{ profile_owner.role }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            {% for movie, data in user_comments.items %}
+                <div class="mb-4">
+                    <h4 class="mb-3">
+                        🎬 <a href="{% url 'movies:detail' movie.slug %}">{{ movie.title }}</a>
+                    </h4>
+
+                    {% for comment in data.comments %}
+                        <div class="mb-3" id="comment-{{ comment.id }}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <p class="card-text">{{ comment.text|safe }}</p>
+                                    </div>
+                                    {% if user.is_authenticated %}
+                                        {% if user.is_moderator or user.is_admin or user.id == comment.author.id %}
+                                            <button class="btn btn-danger btn-sm ms-3 delete-comment"
+                                                    data-url="{% url 'movies:comment_delete' comment.id %}"
+                                                    data-comment-id="{{ comment.id }}">
+                                                Delete
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+
+                                {% if comment.replies.all %}
+                                    <div class="ms-4 mt-3">
+                                        {% for reply in comment.replies.all %}
+                                            <div class="mb-2 bg-light" id="comment-{{ reply.id }}">
+                                                <div class="card-body py-2">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div class="flex-grow-1">
+                                                            <small>↳ {{ reply.text|striptags }}</small>
+                                                        </div>
+                                                        {% if user.is_authenticated %}
+                                                            {% if user.is_moderator or user.is_admin or user.id == reply.author.id %}
+                                                                <button class="btn btn-danger btn-sm ms-3 delete-comment"
+                                                                        data-url="{% url 'movies:comment_delete' reply.id %}"
+                                                                        data-comment-id="{{ reply.id }}">
+                                                                    Delete
+                                                                </button>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    {% if not data.comments and data.replies %}
+                        {% for reply_list in data.replies.values %}
+                            {% for reply in reply_list %}
+                                <div class="mb-2 bg-light" id="comment-{{ reply.id }}">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <p class="card-text">↳ {{ reply.text|striptags }}</p>
+                                            </div>
+                                            {% if user.is_authenticated %}
+                                                {% if user.is_moderator or user.is_admin or user.id == reply.author.id %}
+                                                    <button class="btn btn-danger btn-sm ms-3 delete-comment"
+                                                            data-url="{% url 'movies:comment_delete' reply.id %}"
+                                                            data-comment-id="{{ reply.id }}">
+                                                        Delete
+                                                    </button>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+                    <hr class="my-4">
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

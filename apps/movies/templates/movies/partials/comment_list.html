@@ -1,0 +1,160 @@
+{% for comment in comments %}
+    <li class="media my-4 comment-box" id="comment-{{ comment.id }}">
+        <!-- User Avatar -->
+        <div class="commenterImage">
+            <img src="https://ui-avatars.com/api/?name={{ comment.author.name|urlencode }}&size=50&background=random&rounded=true"
+                 class="rounded-circle" alt="{{ comment.author.name }}" style="width: 50px; height: 50px;" />
+        </div>
+        <div class="media-body commentText">
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- Comment Author and Timestamp -->
+                <div>
+                    <h5 class="mt-0 mb-1">
+                        <a href="{% url 'users:profile' comment.author.id %}" class="text-decoration-none">
+                            {{ comment.author.name }}
+                        </a>
+                        <small class="text-muted ml-2">{{ comment.timestamp }}</small>
+                    </h5>
+                    <div class="d-flex align-items-center" style="gap: 5px;">
+                        <span style="color: gold; font-size: 1.2em;">{{ comment.user_rating }}</span>
+                        <span>
+                            {% for i in star_range %}
+                                {% if i <= comment.user_rating|default:0 %} &#9733; {% else %} &#9734; {% endif %}
+                            {% endfor %}
+                        </span>
+                    </div>
+                </div>
+                <!-- Like and Dislike Buttons -->
+                <div class="comment" data-comment-id="comment-{{ comment.id }}">
+                    {% if user.is_authenticated %}
+                        <button type="button" class="btn btn-outline-success btn-sm mx-1 vote-button"
+                                data-url="{% url 'movies:vote' %}"
+                                data-comment-id="comment-{{ comment.id }}" data-vote-type="like">
+                            Like ({{ comment.likes_count|default:0 }})
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm mx-1 vote-button"
+                                data-url="{% url 'movies:vote' %}"
+                                data-comment-id="comment-{{ comment.id }}" data-vote-type="dislike">
+                            Dislike ({{ comment.dislikes_count|default:0 }})
+                        </button>
+                    {% else %}
+                        <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-outline-success btn-sm mx-1">Like</a>
+                        <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-outline-danger btn-sm mx-1">Dislike</a>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Comment Text -->
+            <p class="comment-display-{{ comment.id }}">{{ comment.text|safe }}</p>
+            <!-- Edit Form -->
+            <div class="edit-form-{{ comment.id }}" style="display: none;">
+                <textarea class="form-control mb-2 edit-textarea" rows="3">{{ comment.text|striptags }}</textarea>
+                <button class="btn btn-success btn-sm save-edit-comment"
+                        data-url="{% url 'movies:comment_edit' comment.id %}"
+                        data-comment-id="{{ comment.id }}">Save</button>
+                <button class="btn btn-secondary btn-sm cancel-edit-comment" data-comment-id="{{ comment.id }}">Cancel</button>
+            </div>
+            <!-- Action Buttons -->
+            <div class="mt-2">
+                {% if user.is_authenticated %}
+                    <a href="#" class="btn btn-primary btn-sm reply-comment" data-comment-id="{{ comment.id }}">Reply</a>
+
+                    {% if user.id == comment.author.id %}
+                        <button class="btn btn-warning btn-sm edit-comment-btn" data-comment-id="{{ comment.id }}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    {% endif %}
+
+                    {% if user.is_moderator or user.is_admin or user.id == comment.author.id %}
+                        <button class="btn btn-danger btn-sm delete-comment"
+                                data-url="{% url 'movies:comment_delete' comment.id %}"
+                                data-comment-id="{{ comment.id }}">Delete</button>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">Reply</a>
+                {% endif %}
+            </div>
+            <!-- Reply Form -->
+            {% if user.is_authenticated %}
+            <div class="reply-form mt-3" style="display: none;">
+                <form method="POST" action="{% url 'movies:comment_create' comment.movie.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                    <textarea name="text" class="form-control mb-2" rows="2" placeholder="Write a reply..." required></textarea>
+                    <button type="submit" class="btn btn-primary btn-sm">Post Reply</button>
+                </form>
+            </div>
+            {% endif %}
+            <!-- Replies -->
+            {% if comment.replies.all %}
+            <ul class="list-unstyled ml-4">
+                {% for reply in comment.replies.all %}
+                <li class="media my-4 reply" id="comment-{{ reply.id }}" data-reply-id="{{ reply.id }}">
+                    <!-- Reply User Avatar -->
+                    <div class="commenterImage">
+                        <a href="{% url 'users:profile' reply.author.id %}">
+                            <img src="https://ui-avatars.com/api/?name={{ reply.author.name|urlencode }}&size=50&background=random&rounded=true"
+                                 class="rounded-circle" style="width: 50px; height: 50px;" />
+                        </a>
+                    </div>
+                    <!-- Reply Body -->
+                    <div class="media-body commentText">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mt-0 mb-1">
+                                    <a href="{% url 'users:profile' reply.author.id %}">{{ reply.author.name }}</a>
+                                    <small class="text-muted ml-2">{{ reply.timestamp }}</small>
+                                </h5>
+                            </div>
+                            <!-- Like and Dislike Buttons for Reply -->
+                            <div class="reply" data-comment-id="reply-{{ reply.id }}">
+                                {% if user.is_authenticated %}
+                                    <button type="button" class="btn btn-outline-success btn-sm mx-1 vote-button"
+                                            data-url="{% url 'movies:vote' %}"
+                                            data-comment-id="comment-{{ reply.id }}" data-vote-type="like">
+                                        Like ({{ reply.likes_count|default:0 }})
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm mx-1 vote-button"
+                                            data-url="{% url 'movies:vote' %}"
+                                            data-comment-id="comment-{{ reply.id }}" data-vote-type="dislike">
+                                        Dislike ({{ reply.dislikes_count|default:0 }})
+                                    </button>
+                                {% else %}
+                                    <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-outline-success btn-sm mx-1">Like</a>
+                                    <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-outline-danger btn-sm mx-1">Dislike</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- Reply Text -->
+                        <p class="comment-display-{{ reply.id }}">{{ reply.text|safe }}</p>
+                        <!-- Edit Form for Reply -->
+                        <div class="edit-form-{{ reply.id }}" style="display: none;">
+                            <textarea class="form-control mb-2 edit-textarea" rows="2">{{ reply.text|striptags }}</textarea>
+                            <button class="btn btn-success btn-sm save-edit-comment"
+                                    data-url="{% url 'movies:comment_edit' reply.id %}"
+                                    data-comment-id="{{ reply.id }}">Save</button>
+                            <button class="btn btn-secondary btn-sm cancel-edit-comment" data-comment-id="{{ reply.id }}">Cancel</button>
+                        </div>
+                        <!-- Action Buttons for Reply -->
+                        <div class="mt-2">
+                            {% if user.is_authenticated %}
+                                {% if user.id == reply.author.id %}
+                                    <button class="btn btn-warning btn-sm edit-comment-btn" data-comment-id="{{ reply.id }}">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                {% endif %}
+
+                                {% if user.is_moderator or user.is_admin or user.id == reply.author.id %}
+                                    <button class="btn btn-danger btn-sm delete-comment"
+                                            data-url="{% url 'movies:comment_delete' reply.id %}"
+                                            data-comment-id="{{ reply.id }}">Delete</button>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </li>
+{% endfor %}

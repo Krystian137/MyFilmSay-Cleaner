@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MyFilmSay - Browse Movies{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<header class="masthead" style="background-image: url('{% static 'assets/img/bg_main_header.jpg' %}')">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="site-heading">
+                    <h1>My Film Say</h1>
+                    <span class="subheading">A place where you can review movies!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Carousel of Random Movies -->
+{% if random_movies %}
+<div class="carouselMain p-2">
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+        <div class="carousel-inner">
+            <!-- Loop through random movies -->
+            {% for movie in random_movies %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 d-flex justify-content-center">
+                            <img src="{% if movie.img_url %}{{ movie.img_url }}{% else %}{% static 'assets/img/placeholder.jpg' %}{% endif %}"
+                                 alt="{{ movie.title }}" class="img-fluid movie-poster">
+                        </div>
+                        <!-- Movie Details -->
+                        <div class="col-md-8 movie-info">
+                            <h2>{{ movie.title }} ({{ movie.date }})</h2>
+                            <p><strong>Rating:</strong> {{ movie.rating }}</p>
+                            <p><strong>Release Date:</strong> {{ movie.date }}</p>
+                            <p><strong>Genres:</strong> {{ movie.genres }}</p>
+                            <p class="overview">
+                                <strong>Overview:</strong>
+                                {{ movie.body|truncatechars:250|safe }}
+                                {% if movie.body|length > 250 %}...{% endif %}
+                            </p>
+                            <p><strong>Director:</strong> {{ movie.director }}</p>
+                            <p><strong>Writers:</strong> {{ movie.writers }}</p>
+                            <a href="{% url 'movies:detail' movie.slug %}" class="btn btn-primary">More info</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="carousel-controls">
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="container p-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>All Movies</h1>
+        {% if user.is_moderator or user.is_admin %}
+            <a class="btn btn-success" href="{% url 'movies:find' %}">
+                <i class="fas fa-plus"></i> Add New Movie
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Sorting Menu -->
+    <div class="sort-container d-flex mb-4">
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Sort By: {{ current_sort|capfirst }}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="?sort=title&order=asc">Title</a></li>
+                <li><a class="dropdown-item" href="?sort=rating&order=desc">Rating</a></li>
+                <li><a class="dropdown-item" href="?sort=date&order=desc">Release Date</a></li>
+            </ul>
+        </div>
+    </div>
+    <!-- Movie Cards -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 justify-content-center">
+        {% for movie in all_movies %}
+        <div class="col">
+            <a href="{% url 'movies:detail' movie.slug %}" class="text-decoration-none">
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="front" style="background-image: url('{% if movie.img_url %}{{ movie.img_url }}{% else %}{% static 'assets/img/placeholder.jpg' %}{% endif %}');">
+                        </div>
+                        <div class="back">
+                            <div>
+                                <div class="title">
+                                    {{ movie.title }} <span class="release_date">({{ movie.date }})</span>
+                                </div>
+                                <div class="rating">
+                                    <label>{{ movie.rating|default:"N/A" }}</label>
+                                    <i class="fas fa-star star"></i>
+                                </div>
+                                <p class="overview">{{ movie.genres|default:"No genres" }}</p>
+                                {% if user.is_moderator %}
+                                <div class="mt-2">
+                                    <a href="{% url 'movies:update' movie.slug %}" class="btn btn-success btn-sm">Edit</a>
+                                    <form action="{% url 'movies:delete' movie.slug %}" method="post" class="d-inline" onsubmit="return confirm('Delete this movie?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No movies available yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
