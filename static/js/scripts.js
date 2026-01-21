@@ -113,7 +113,7 @@ document.addEventListener('click', function(e) {
     // Save edit
     if (e.target.classList.contains('save-edit-comment')) {
         const commentId = e.target.dataset.commentId;
-        const url = e.target.dataset.url; // Użyj URL z template zamiast budować ręcznie
+        const url = e.target.dataset.url;
 
         console.log('Trying to edit comment:', commentId);
         console.log('URL from template:', url);
