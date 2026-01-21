@@ -27,7 +27,7 @@ MOVIE_DB_INFO_URL = "https://api.themoviedb.org/3/movie"
 # Check if user has permissions
 class PermissionMixin(UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.is_authenticated and self.request.user.is_admin or self.request.user.is_moderator
+        return self.request.user.is_authenticated and (self.request.user.is_admin or self.request.user.is_moderator)
 
     def handle_no_permission(self):
         messages.error(self.request, "You don't have permission to access this page.")
